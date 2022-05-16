@@ -53,10 +53,49 @@ public class Controller : MonoBehaviour
 
         //TODO: Inicializar matriz a 0's
 
-        //TODO: Para cada posición, rellenar con 1's las casillas adyacentes (arriba, abajo, izquierda y derecha)
+        // no fa falta, perque al crear la matriu s'inicialitza a 0    
+
+        //TODO: Para cada posición, rellenar con 1's las casillas adyacentes (dalt, baix, esquerra i dreta)
+        for (int i = 0; i < Constants.NumTiles; i++)
+        {
+            //int dalt = matriu[i + 1, j];
+            //int baix = matriu[i - 1, j];
+            //int dreta = matriu[i, j + 1];
+            //int esquerra = matriu[i, j - 1];
+
+            if (i > 7)
+            {
+                matriu[i, i - 8] = 1;
+            }
+
+            if (i % 8 != 7)
+            {
+                matriu[i, i + 1] = 1;
+            }
+
+            if (i < 56)
+            {
+                matriu[i, i +8] = 1;
+            }
+
+            if (i % 8 != 0)
+            {
+                matriu[i, i - 1] = 1;
+            }
+        }
 
         //TODO: Rellenar la lista "adjacency" de cada casilla con los índices de sus casillas adyacentes
 
+        for (int i = 0; i < Constants.NumTiles; i++)
+        {
+            for (int j = 0; j < Constants.NumTiles; j++)
+            {
+                if (matriu[i, j] == 1)
+                {
+                    tiles[i].adjacency.Add(tiles[j].numTile);
+                }
+            }
+        }
     }
 
     //Reseteamos cada casilla: color, padre, distancia y visitada
@@ -139,14 +178,40 @@ public class Controller : MonoBehaviour
         clickedTile = robber.GetComponent<RobberMove>().currentTile;
         tiles[clickedTile].current = true;
         FindSelectableTiles(false);
-
+        int Contador = tiles[clickedTile].adjacency.Count;
+        int posicion=60;
         /*TODO: Cambia el código de abajo para hacer lo siguiente
         - Elegimos una casilla aleatoria entre las seleccionables que puede ir el caco
         - Movemos al caco a esa casilla
         - Actualizamos la variable currentTile del caco a la nueva casilla
         */
-        robber.GetComponent<RobberMove>().MoveToTile(tiles[robber.GetComponent<RobberMove>().currentTile]);
+
+        int valorRandom = Random.Range(0,Contador);
+        Debug.Log("PosC1 "+cops[0].GetComponent<CopMove>().currentTile%8);
+        Debug.Log("PosC2 " + cops[1].GetComponent<CopMove>().currentTile%8);
+        Debug.Log("PosR " + robber.GetComponent<RobberMove>().currentTile%8);
+
+        //foreach (int i in tiles[clickedTile].adjacency)
+        //{
+        //    Debug.Log("i "+i);
+        //    if ((i%8) < (cops[0].GetComponent<CopMove>().currentTile%8) /*&& (i % 8 != cops[1].GetComponent<CopMove>().currentTile)*/)
+        //    {
+        //        posicion = i;
+
+        //    }
+        //    else
+        //    {
+        //        posicion = 50;
+        //    }
+        //    Debug.Log("Pos "+posicion);
+        //}
+        //
+        posicion = tiles[clickedTile].adjacency[valorRandom];
+
+        robber.GetComponent<RobberMove>().MoveToTile(tiles[posicion]);
+        clickedTile = robber.GetComponent<RobberMove>().currentTile = posicion;
     }
+    
 
     public void EndGame(bool end)
     {
@@ -204,11 +269,10 @@ public class Controller : MonoBehaviour
 
         //TODO: Implementar BFS. Los nodos seleccionables los ponemos como selectable=true
         //Tendrás que cambiar este código por el BFS
-        for(int i = 0; i < Constants.NumTiles; i++)
+        foreach (int i in tiles[indexcurrentTile].adjacency )
         {
-            tiles[i].selectable = true;
+            tiles[i].selectable= true;         
         }
-
 
     }
     
