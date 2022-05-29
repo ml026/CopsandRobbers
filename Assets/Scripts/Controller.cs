@@ -18,8 +18,8 @@ public class Controller : MonoBehaviour
     private int roundCount = 0;
     private int state;
     private int clickedTile = -1;
-    private int clickedCop = 0;
-                    
+    private int clickedCop = 0;  
+
     void Start()
     {        
         InitTiles();
@@ -58,10 +58,6 @@ public class Controller : MonoBehaviour
         //TODO: Para cada posición, rellenar con 1's las casillas adyacentes (dalt, baix, esquerra i dreta)
         for (int i = 0; i < Constants.NumTiles; i++)
         {
-            //int dalt = matriu[i + 1, j];
-            //int baix = matriu[i - 1, j];
-            //int dreta = matriu[i, j + 1];
-            //int esquerra = matriu[i, j - 1];
 
             if (i > 7)
             {
@@ -75,7 +71,7 @@ public class Controller : MonoBehaviour
 
             if (i < 56)
             {
-                matriu[i, i +8] = 1;
+                matriu[i, i + 8] = 1;
             }
 
             if (i % 8 != 0)
@@ -178,36 +174,84 @@ public class Controller : MonoBehaviour
         clickedTile = robber.GetComponent<RobberMove>().currentTile;
         tiles[clickedTile].current = true;
         FindSelectableTiles(false);
-        int Contador = tiles[clickedTile].adjacency.Count;
-        int posicion=60;
+        int posicion=-1;
+        int distanciaCop1;
+        int distanciaCop2;
+        int distanciaCop1y;
+        int distanciaCop1x;
+        int distanciaCop2y;
+        int distanciaCop2x;
+        int distanciaCops;
+        int distanciaMax=0;
+        var valorRandom = Random.Range(0, 2);
+
         /*TODO: Cambia el código de abajo para hacer lo siguiente
         - Elegimos una casilla aleatoria entre las seleccionables que puede ir el caco
         - Movemos al caco a esa casilla
         - Actualizamos la variable currentTile del caco a la nueva casilla
         */
+        foreach (int i in tiles[clickedTile].adjacency)
+        {
+            distanciaCop1x = (i % 8) - (cops[0].GetComponent<CopMove>().currentTile % 8);
+            distanciaCop1y = (i / 8) - (cops[0].GetComponent<CopMove>().currentTile / 8);
+            distanciaCop2x = (i % 8) - (cops[1].GetComponent<CopMove>().currentTile % 8);
+            distanciaCop2y = (i / 8) - (cops[1].GetComponent<CopMove>().currentTile / 8);
 
-        int valorRandom = Random.Range(0,Contador);
-        Debug.Log("PosC1 "+cops[0].GetComponent<CopMove>().currentTile%8);
-        Debug.Log("PosC2 " + cops[1].GetComponent<CopMove>().currentTile%8);
-        Debug.Log("PosR " + robber.GetComponent<RobberMove>().currentTile%8);
 
-        //foreach (int i in tiles[clickedTile].adjacency)
-        //{
-        //    Debug.Log("i "+i);
-        //    if ((i%8) < (cops[0].GetComponent<CopMove>().currentTile%8) /*&& (i % 8 != cops[1].GetComponent<CopMove>().currentTile)*/)
-        //    {
-        //        posicion = i;
+            if (distanciaCop1x < 0)
+            {
+                distanciaCop1x*= (-1);
+            }
 
-        //    }
-        //    else
-        //    {
-        //        posicion = 50;
-        //    }
-        //    Debug.Log("Pos "+posicion);
-        //}
-        //
-        posicion = tiles[clickedTile].adjacency[valorRandom];
+            if (distanciaCop1y < 0)
+            {
+                distanciaCop1y *= (-1);
+            }
 
+            if (distanciaCop2x < 0)
+            {
+                distanciaCop2x *= (-1);
+            }
+
+            if (distanciaCop2y < 0)
+            {
+                distanciaCop2y *= (-1);
+            }
+
+            distanciaCop1 = distanciaCop1x + distanciaCop1y;
+            distanciaCop2 = distanciaCop2x + distanciaCop2y;
+
+            distanciaCops = distanciaCop1 + distanciaCop2;
+
+            if (distanciaCop1 < distanciaCop2 && distanciaCop1 > distanciaMax && cops[0].GetComponent<CopMove>().currentTile != i && cops[0].GetComponent<CopMove>().currentTile+1 != i && cops[0].GetComponent<CopMove>().currentTile-1 != i && cops[0].GetComponent<CopMove>().currentTile+8 != i && cops[0].GetComponent<CopMove>().currentTile-8 != i)
+            {
+                distanciaMax = distanciaCop1;
+                posicion = i;
+            }
+            else if (distanciaCop2 < distanciaCop1 && distanciaCop2 > distanciaMax && cops[1].GetComponent<CopMove>().currentTile != i && cops[1].GetComponent<CopMove>().currentTile + 1 != i && cops[1].GetComponent<CopMove>().currentTile - 1 != i && cops[1].GetComponent<CopMove>().currentTile + 8 != i && cops[1].GetComponent<CopMove>().currentTile - 8 != i)
+            {
+                distanciaMax = distanciaCop2;
+                posicion = i;
+            }
+            else if(distanciaCop1 == distanciaCop2)
+            {
+                if (distanciaCop1 <= distanciaCop2 &&  cops[0].GetComponent<CopMove>().currentTile != i && cops[0].GetComponent<CopMove>().currentTile + 1 != i && cops[0].GetComponent<CopMove>().currentTile - 1 != i && cops[0].GetComponent<CopMove>().currentTile + 8 != i && cops[0].GetComponent<CopMove>().currentTile - 8 != i && distanciaCop2 <= distanciaCop1  && cops[1].GetComponent<CopMove>().currentTile != i && cops[1].GetComponent<CopMove>().currentTile + 1 != i && cops[1].GetComponent<CopMove>().currentTile - 1 != i && cops[1].GetComponent<CopMove>().currentTile + 8 != i && cops[1].GetComponent<CopMove>().currentTile - 8 != i)
+                {
+                    posicion = i;
+                }
+            }
+            else
+            {
+                if (posicion==-1)
+                {
+                    posicion = i;
+                } 
+            }
+        }
+ 
+
+        //per si el vols random
+        //posicion = tiles[clickedTile].adjacency[valorRandom];
         robber.GetComponent<RobberMove>().MoveToTile(tiles[posicion]);
         clickedTile = robber.GetComponent<RobberMove>().currentTile = posicion;
     }
